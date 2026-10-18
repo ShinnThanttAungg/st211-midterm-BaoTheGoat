@@ -12,8 +12,7 @@ class Users:
         self.users[username] = password
         return True
 
-    def login(self, username, password):
+   def login(self, username, password):
         """Return True if the username exists and the password matches."""
         stored = self.users.get(username)
-        cleaned = "".join(ch for ch in password if ch.isalnum())
-        return stored is not None and stored == cleaned
+        return stored is not None and stored == password
