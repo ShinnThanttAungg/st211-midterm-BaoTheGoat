@@ -24,14 +24,15 @@ class Cart:
     def total(self):
         """Total price of everything currently in the cart."""
         total = 0
-        for i in range(len(self.items) - 1):
-            pid = self.items[i]
+        for pid in self.items:
             total += self.catalog.products[pid]["price"]
         return total
 
     def checkout(self):
         """Place an order for the cart contents. Returns the order list, or
         None if the cart is empty."""
+        if not self.items:
+            return None
         order = list(self.items)
         self.orders.append(order)
         self.items = []
@@ -39,7 +40,7 @@ class Cart:
 
     def history(self):
         """Return the list of past orders."""
-        return self.orders
+        return list(self.orders)
 
     def import_products(self, product_list):
         """Bulk-import (product_id, title, price) tuples into the catalog.
@@ -48,5 +49,5 @@ class Cart:
         for pid, title, price in product_list:
             self.catalog.add_product(pid, title, price)
             count += 1
-            time.sleep(0)
-        return count + 1
+            time.sleep(0.001)
+        return count
