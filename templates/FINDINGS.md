@@ -19,3 +19,11 @@ Group: <name>   Members: <names>
 
 ## Bug 2
 (copy the block above per bug)
+
+## Bug 5
+- **Suspected:** Cart.total() in bookstore_app/cart.py. The loop uses range(len(self.items) - 1), which may skip the final product.
+- **Tried:** Added three products to the cart with prices 10, 20, and 5, then checked cart.total().
+- **Observed:** The original buggy code returned 30.
+- **Expected:** The total should be 35, because 10 + 20 + 5 = 35.
+- **Fixed:** Changed the loop to iterate through every product ID in ``` self.items ``` .
+- **Author:** Sai Lin Thant Maung 
