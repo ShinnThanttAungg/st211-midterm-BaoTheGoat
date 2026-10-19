@@ -42,3 +42,56 @@ def test_catalog_search_case_insensitive():
 
 
 # ---- YOUR SLOW TESTS (at least 2) ----
+@pytest.mark.slow
+def test_bulk_import_stores_twenty_thousand_products():
+    """Author: ScottG619. Slow: import and verify 20,000 products."""
+    # Arrange
+    catalog = Catalog()
+    cart = Cart(catalog)
+    product_count = 20_000
+
+    products = [
+        (product_id, f"book {product_id}", 100)
+        for product_id in range(product_count)
+    ]
+
+    # Act
+    # Slow: processes 20,000 records through the real import method.
+    imported_count = cart.import_products(products)
+
+    # Assert
+    assert imported_count == product_count
+    assert len(catalog.products) == product_count
+
+    for product_id, title, price in products:
+        assert catalog.products[product_id] == {
+            "title": title,
+            "price": price,
+        }
+
+
+@pytest.mark.slow
+def test_repeated_searches_return_correct_products_in_large_catalog():
+    """Author: ScottG619. Slow: 3,000 searches across 10,000 products."""
+    # Arrange
+    catalog = Catalog()
+    product_count = 10_000
+    search_count = 3_000
+
+    for product_id in range(product_count):
+        if product_id % 100 == 0:
+            title = f"python book {product_id}"
+        else:
+            title = f"history book {product_id}"
+
+        catalog.add_product(product_id, title, 100)
+
+    expected_ids = set(range(0, product_count, 100))
+
+    # Act and Assert
+    # Slow: approximately 30 million product checks in total.
+    for _ in range(search_count):
+        actual_ids = catalog.search("python")
+
+        assert len(actual_ids) == len(expected_ids)
+        assert set(actual_ids) == expected_ids
