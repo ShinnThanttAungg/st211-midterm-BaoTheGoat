@@ -5,8 +5,8 @@ Group: <name>   Members: <names>
 ## D3.1 Declaration (required)
 | AI tool | How we used it |
 |---|---|
-| Chat GPT| To research and Explaination |
-| Claud | |
+|  | |
+|  | |
 
 ## D3.2 Audit of the supplied ai_review/ test set (graded core)
 Run EACH test in ai_review/ against the shipped app and record real evidence.
