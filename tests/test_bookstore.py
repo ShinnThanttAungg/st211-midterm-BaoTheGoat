@@ -65,6 +65,24 @@ def test_checkout_cart():
     assert cart.items == []
 
 
-# ---- YOUR REGRESSION TESTS (the bug hunt) ----
+# ---- YOU REGRESSION TESTS (the bug hunt) ----
+
+@pytest.mark.regression
+def test_login_password_special_characters():
+    """Author: Aung Thet Khine. Check that login rejects an incorrect password."""
+    users = Users()
+    users.register("student1", "hello123")
+
+    assert users.login("student1", "hello@123") is False
+
+
+@pytest.mark.regression
+def test_catalog_search_case_insensitive():
+    """Author: Aung Thet Khine. Check that searching ignores uppercase and lowercase."""
+    catalog = Catalog()
+    catalog.add_product(1, "Python Programming", 500)
+
+    assert 1 in catalog.search("python")
+
 
 # ---- YOUR SLOW TESTS (at least 2) ----
