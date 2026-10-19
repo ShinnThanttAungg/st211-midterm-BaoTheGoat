@@ -22,14 +22,14 @@ def test_example_register():
 # ---- YOUR SMOKE TESTS (at least 5) ----
 @pytest.mark.smoke
 def test_register_user():
-    """Author: Sai Smoke: a new user can register."""
+    """Author: Sai. Smoke: a new user can register."""
     users = Users()
     assert users.register("newuser", "password123") is True
 
 
 @pytest.mark.smoke
 def test_login_works():
-    """Author: Sai Smoke: a registered user can log in."""
+    """Author: Sai. Smoke: a registered user can log in."""
     users = Users()
     users.register("alice", "password123")
     assert users.login("alice", "password123") is True
@@ -37,7 +37,7 @@ def test_login_works():
 
 @pytest.mark.smoke
 def test_add_product_to_catalog():
-    """Author: Sai Smoke: a product can be added to the catalog."""
+    """Author: Sai. Smoke: a product can be added to the catalog."""
     catalog = Catalog()
     catalog.add_product("B1", "Python Book", 10)
     assert "B1" in catalog.products
@@ -45,7 +45,7 @@ def test_add_product_to_catalog():
 
 @pytest.mark.smoke
 def test_add_product_to_cart():
-    """Author: Sai Smoke: a valid product can be added to the cart."""
+    """Author: Sai. Smoke: a valid product can be added to the cart."""
     catalog = Catalog()
     catalog.add_product("B1", "Python Book", 10)
     cart = Cart(catalog)
@@ -55,7 +55,7 @@ def test_add_product_to_cart():
 
 @pytest.mark.smoke
 def test_checkout_cart():
-    """Author: Sai Smoke: checkout saves the order."""
+    """Author: Sai. Smoke: checkout saves the order."""
     catalog = Catalog()
     catalog.add_product("B1", "Python Book", 10)
     cart = Cart(catalog)
@@ -65,7 +65,7 @@ def test_checkout_cart():
     assert cart.items == []
 
 
-# ---- YOU REGRESSION TESTS (the bug hunt) ----
+# ---- REGRESSION TESTS (the bug hunt) ----
 
 @pytest.mark.regression
 def test_login_password_special_characters():
@@ -84,11 +84,86 @@ def test_catalog_search_case_insensitive():
 
     assert 1 in catalog.search("python")
 
+@pytest.mark.regression
+def test_cart_checkout_empty_cart():
+    """Author: Ethan. Check that checkout returns an empty list for an empty cart."""
+    catalog = Catalog()
+    cart = Cart(catalog)
 
-# ---- YOUR SLOW TESTS (at least 2) ----
+    assert cart.checkout() == []
+
+@pytest.mark.regression
+def test_cart_add_nonexistent_product():
+    """Author: Ethan. Check that adding a nonexistent product returns False."""
+    catalog = Catalog()
+    cart = Cart(catalog)
+
+    assert cart.add("nonexistent_product") is False
+
+@pytest.mark.regression
+def test_cart_remove_product_not_in_cart():
+    """Author: Ethan. Check that removing a product not in the cart returns False."""
+    catalog = Catalog()
+    cart = Cart(catalog)
+
+    assert cart.remove("nonexistent_product") is False
+
+@pytest.mark.regression
+def test_cart_remove_product_in_cart():
+    """Author: Ethan. Check that removing a product in the cart returns True and removes it."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    cart = Cart(catalog)
+    cart.add("B1")
+
+    assert cart.remove("B1") is True
+    assert "B1" not in cart.items
+
+@pytest.mark.regression
+def test_cart_add_and_remove_product():
+    """Author: Ethan. Check that adding and removing a product works correctly."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    cart = Cart(catalog)
+
+    assert cart.add("B1") is True
+    assert "B1" in cart.items
+
+    assert cart.remove("B1") is True
+    assert "B1" not in cart.items
+
+@pytest.mark.regression
+def test_cart_checkout_with_multiple_products():
+    """Author: Ethan. Check that checkout returns all products in the cart."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    catalog.add_product("B2", "JavaScript Book", 15)
+    cart = Cart(catalog)
+    cart.add("B1")
+    cart.add("B2")
+
+    assert cart.checkout() == ["B1", "B2"]
+    assert cart.items == []
+
+@pytest.mark.regression
+def test_cart_checkout_after_removing_product():
+    """Author: Ethan. Check that checkout returns the correct products after removing one."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    catalog.add_product("B2", "JavaScript Book", 15)
+    cart = Cart(catalog)
+    cart.add("B1")
+    cart.add("B2")
+    cart.remove("B1")
+
+    assert cart.checkout() == ["B2"]
+    assert cart.items == []
+
+
+# ---- SLOW TESTS ----
 @pytest.mark.slow
 def test_bulk_import_stores_twenty_thousand_products():
-    """Author: ScottG619. Slow: import and verify 20,000 products."""
+    """Author: Scott. Slow: import and verify 20,000 products."""
     # Arrange
     catalog = Catalog()
     cart = Cart(catalog)
@@ -116,7 +191,7 @@ def test_bulk_import_stores_twenty_thousand_products():
 
 @pytest.mark.slow
 def test_repeated_searches_return_correct_products_in_large_catalog():
-    """Author: ScottG619. Slow: 3,000 searches across 10,000 products."""
+    """Author: Scott. Slow: 3,000 searches across 10,000 products."""
     # Arrange
     catalog = Catalog()
     product_count = 10_000
