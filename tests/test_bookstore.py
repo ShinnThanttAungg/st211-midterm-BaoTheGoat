@@ -32,6 +32,7 @@ def test_register_new_user_then_duplicate_rejected():
     assert "alice" in u.users
     assert u.register("alice", "other") is False
 
+<<<<<<< HEAD
 @pytest.mark.smoke
 def test_login_correct_ok_wrong_rejected():
     """Author: <name>. Smoke: right password logs in, wrong one does not."""
@@ -39,6 +40,53 @@ def test_login_correct_ok_wrong_rejected():
     assert u.login("alice", "secret1") is True
     assert u.login("alice", "wrongpw") is False   # catches 'accepts any password'
     assert u.login("nobody", "secret1") is False
+=======
+# ---- YOUR SMOKE TESTS (at least 5) ----
+@pytest.mark.smoke
+def test_register_user():
+    """Author: Sai Smoke: a new user can register."""
+    users = Users()
+    assert users.register("newuser", "password123") is True
+
+
+@pytest.mark.smoke
+def test_login_works():
+    """Author: Sai Smoke: a registered user can log in."""
+    users = Users()
+    users.register("alice", "password123")
+    assert users.login("alice", "password123") is True
+
+
+@pytest.mark.smoke
+def test_add_product_to_catalog():
+    """Author: Sai Smoke: a product can be added to the catalog."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    assert "B1" in catalog.products
+
+
+@pytest.mark.smoke
+def test_add_product_to_cart():
+    """Author: Sai Smoke: a valid product can be added to the cart."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    cart = Cart(catalog)
+    assert cart.add("B1") is True
+    assert cart.items == ["B1"]
+
+
+@pytest.mark.smoke
+def test_checkout_cart():
+    """Author: Sai Smoke: checkout saves the order."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    cart = Cart(catalog)
+    cart.add("B1")
+
+    assert cart.checkout() == ["B1"]
+    assert cart.items == []
+
+>>>>>>> origin/main
 
 @pytest.mark.smoke
 def test_add_product_is_saved_and_searchable():

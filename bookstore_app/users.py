@@ -1,10 +1,9 @@
-
 """User accounts: registration and login."""
 
 
 class Users:
     def __init__(self):
-        self.users = {}  # username -> password
+        self.users = {}   # username -> password
 
     def register(self, username, password):
         """Register a new user. Returns True on success, False if taken."""
@@ -14,6 +13,6 @@ class Users:
         return True
 
     def login(self, username, password):
-        """Return True if username exists and password matches."""
+        """Return True if the username exists and the password matches."""
         stored = self.users.get(username)
         return stored is not None and stored == password

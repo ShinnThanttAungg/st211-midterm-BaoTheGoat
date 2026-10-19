@@ -1,6 +1,14 @@
 # AI Usage Declaration and Audit
 
-**Group:** _____________________  **Members:** _____________________________
+**Group:** 
+      Bao The Goat  
+
+**Members:**  
+      Shinn Thant Aung - 6705140076
+      Zwe Naing Set - 6705140077
+      Sai Lin Thant Maung - 6705140073
+      Hein Naing Soe - 6705140071
+      Aung Thet Kaing - 
 
 **Part D3 of the midterm — 20 marks.** Part 1 is required but carries no marks;
 its absence is an academic-honesty matter. Part 2 is worth 16 (2 per test).
