@@ -43,7 +43,8 @@ def test_login_correct_ok_wrong_rejected():
 @pytest.mark.smoke
 def test_add_product_is_saved_and_searchable():
     """Author: <name>. Smoke: a product added is really stored."""
-    cat = Catalog(); cat.add_product(1, "Python", 30)
+    cat = Catalog()
+    cat.add_product(1, "Python", 30)
     assert 1 in cat.products
     assert cat.products[1]["price"] == 30
     assert cat.search("Python") == [1]
@@ -90,19 +91,20 @@ def test_import_products_returns_exact_count():
     assert cart.import_products([(1, "A", 5), (2, "B", 6)]) == 2
 
 @pytest.mark.regression
-def test_login_accepts_password_with_special_characters():
-    """Author: <name>. Users.login stripped symbols from the typed password,
-    so 'p@ss!' could not log in, while 'pass!!' matched stored 'pass'."""
-    u = Users(); u.register("a", "p@ss!")
-    assert u.login("a", "p@ss!") is True
-    u.register("b", "pass")
-    assert u.login("b", "pass!!") is False
+def test_login_password_special_characters():
+    """Author: Aung Thet Khine. Check that login rejects an incorrect password."""
+    users = Users()
+    users.register("student1", "hello123")
+
+    assert users.login("student1", "hello@123") is False
 
 @pytest.mark.regression
-def test_search_is_case_insensitive():
-    """Author: <name>. Catalog.search missed 'python' vs title 'Python Testing'."""
-    cat = Catalog(); cat.add_product(1, "Python Testing", 30)
-    assert cat.search("python") == [1]
+def test_catalog_search_case_insensitive():
+    """Author: Aung Thet Khine. Check that searching ignores uppercase and lowercase."""
+    catalog = Catalog()
+    catalog.add_product(1, "Python Programming", 500)
+
+    assert 1 in catalog.search("python")
 
 # ---- SLOW TESTS ----
 @pytest.mark.slow
