@@ -18,4 +18,4 @@ class Catalog:
         for pid, info in self.products.items():
             if keyword.lower() in info["title"].lower():
                 results.append(pid)
-        return results
+        return results[:10]  # Limit to 10 results
