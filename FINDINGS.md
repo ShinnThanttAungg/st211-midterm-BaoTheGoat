@@ -35,6 +35,14 @@ Members: <Aung Thet Khine - 6705142032>
 - **The fix we made:** < We used .lower() on both the keyword and product title before comparing them. After fixing the function, we ran the regression test again and it passed.>
 - **Author of this finding:** < Aung Thet Khine >
 
+## Bug 5
+- **Suspected:** Cart.total() in bookstore_app/cart.py. The loop uses range(len(self.items) - 1), which may skip the final product.
+- **Tried:** Added three products to the cart with prices 10, 20, and 5, then checked cart.total().
+- **Observed:** The original buggy code returned 30.
+- **Expected:** The total should be 35, because 10 + 20 + 5 = 35.
+- **Fixed:** Changed the loop to iterate through every product ID in ``` self.items ``` .
+- **Author:** Sai Lin Thant Maung 
+
 ---
 
 ## Bug 3
