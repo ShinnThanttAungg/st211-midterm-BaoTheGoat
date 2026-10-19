@@ -7,7 +7,8 @@ name: tests
 
 on:
   push:
-  # TODO: add a scheduled nightly trigger (hint: 'schedule:' with a cron entry)
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   smoke:
@@ -19,4 +20,14 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: pytest -m smoke
-      # TODO: add a job (or step) that runs the full suite on the nightly schedule
+
+  full:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: pytest
