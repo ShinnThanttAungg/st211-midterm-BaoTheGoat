@@ -32,7 +32,7 @@ class Cart:
         """Place an order for the cart contents. Returns the order list, or
         None if the cart is empty."""
         if not self.items:
-            return [] # Return an empty list for an empty cart
+            return None  # Return None for an empty cart
         order = list(self.items)
         self.orders.append(order)
         self.items = []
