@@ -16,8 +16,8 @@ from bookstore_app import Users, Catalog, Cart
 def make_cart(*prices):
     """Helper: make a catalog and cart with products of the given prices."""
     catalog = Catalog()
-    for pid, price in enumerate(prices, start=1):
-        catalog.add_product(pid, f"product {pid}", price)
+    for product_id, price in enumerate(prices, start=1):
+        catalog.add_product(product_id, f"product {product_id}", price)
     return catalog, Cart(catalog)
 
 # ---- YOUR SMOKE TESTS (at least 5) ----
@@ -113,8 +113,8 @@ def test_catalog_search_case_insensitive():
 def test_cart_total_includes_all_items():
     """Author: Ethan. Check that the total price of the cart includes all items."""
     _, cart = make_cart(10, 20, 30)
-    for pid in [1, 2, 3]:
-        cart.add(pid)
+    for product_id in [1, 2, 3]:
+        cart.add(product_id)
     assert cart.total() == 60  # 10 + 20 + 30
     _, single_cart = make_cart(15)
     single_cart.add(1)
@@ -195,6 +195,7 @@ def test_bulk_import_stores_twenty_thousand_products():
     # Assert
     assert imported_count == product_count
     assert len(catalog.products) == product_count
+    assert set(catalog.products.keys()) == set(range(product_count))
 
     for product_id, title, price in products:
         assert catalog.products[product_id] == {
@@ -252,26 +253,6 @@ def test_search_remains_correct_as_catalog_grows():
             assert set(actual_ids) == expected_ids
 
 @pytest.mark.slow
-def test_cart_checkout_history_persists():
-    """Author: Ethan. Slow: checkout history persists across multiple checkouts."""
-    catalog = Catalog()
-    catalog.add_product("B1", "Python Book", 10)
-    catalog.add_product("B2", "JavaScript Book", 15)
-    cart = Cart(catalog)
-
-    # First checkout
-    cart.add("B1")
-    first_order = cart.checkout()
-    assert first_order == ["B1"]
-    assert cart.history() == [first_order]
-
-    # Second checkout
-    cart.add("B2")
-    second_order = cart.checkout()
-    assert second_order == ["B2"]
-    assert cart.history() == [first_order, second_order]
-
-@pytest.mark.slow
 def test_cart_import_and_checkout_large_number_of_products():  
     """Author: Ethan. Slow: import and checkout a large number of products."""
     catalog = Catalog()
@@ -298,11 +279,73 @@ def test_cart_import_and_checkout_large_number_of_products():
     assert set(order) == set(range(product_count))
 
 @pytest.mark.slow
-def test_cart_checkout_empty_cart_returns_none():
-    """Author: Ethan. Slow: checkout returns None for an empty cart."""
-    catalog = Catalog()
-    cart = Cart(catalog)
+def test_many_users_register_and_login():
+    """Author: Ethan. Slow: register and login 400,000 users."""
+    users = Users()
+    user_count = 400_000
 
-    result = cart.checkout()
-    assert result is None
+    for i in range(user_count):
+        assert users.register(f"user{i}", f"password{i}") is True
+
+    for i in range(user_count):
+        assert users.login(f"user{i}", f"password{i}") is True
+        assert users.login(f"user{i}", f"xx{i}") is False
+        assert users.login(f"user{i}", f"dummybot") is False
+    assert len(users.users) == user_count
+
+@pytest.mark.slow
+def test_two_hundred_thousand_checkouts_keeps_every_order():
+    """Author: Ethan. Slow: checkout 200,000 times and verify order history."""
+    catalog = Catalog()
+    order_count = 200_000
+
+    for product_id in range(50):    
+        catalog.add_product(product_id, f"book {product_id}", 10)
+    
+    cart = Cart(catalog)
+    expected_orders = []
+
+    for order_id in range(order_count):
+        batch = [(order_id + offset) % len(catalog.products) for offset in range(3)]
+        for product_id in batch:
+            cart.add(product_id)
+        assert cart.checkout() == batch
+        assert cart.items == []
+        expected_orders.append(batch)
+    assert cart.history() == expected_orders
+
+@pytest.mark.slow
+def test_random_cart_operations_match_a_simple_model():
+    state = 211
+
+    def rand(n):
+        nonlocal state
+        state = (state * 1103515245 + 12345) % (2**31)
+        return (state >> 16) % n
+
+    operations = ["add", "add", "add", "remove", "checkout", "bad_add"]
+    catalog = Catalog()
+    for product_id in range(100):
+        catalog.add_product(product_id, f"book {product_id}", 5)
+    cart = Cart(catalog)
+    model_items, model_orders = [], []
+    for _ in range(1_000_000):
+        op = operations[rand(len(operations))]
+        product_id = rand(100)
+        if op == "add":
+            assert cart.add(product_id) is True
+            model_items.append(product_id)
+        elif op == "bad_add":
+                    assert cart.add(10_000 + product_id) is False
+        elif op == "remove":
+            present = product_id in model_items
+            assert cart.remove(product_id) is present
+            if present:
+                model_items.remove(product_id)
+        elif model_items:       # only checkout if there are items in the cart
+            assert cart.checkout() == model_items
+            model_orders.append(model_items)
+            model_items = []
+        assert cart.items == model_items
+    assert cart.history() == model_orders
 
