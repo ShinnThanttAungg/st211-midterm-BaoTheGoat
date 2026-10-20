@@ -19,3 +19,11 @@ class Catalog:
             if keyword.lower() in info["title"].lower():
                 results.append(pid)
         return results[:10]  # Limit to 10 results
+
+    def search_all(self, query):
+        """Return all product IDs whose titles contain the query."""
+        results = []
+        for pid, info in self.products.items():
+            if query.lower() in info["title"].lower():
+                results.append(pid)
+        return results
