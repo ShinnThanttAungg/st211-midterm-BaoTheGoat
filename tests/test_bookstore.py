@@ -214,3 +214,91 @@ def test_repeated_searches_return_correct_products_in_large_catalog():
 
         assert len(actual_ids) == len(expected_ids)
         assert set(actual_ids) == expected_ids
+
+@pytest.mark.slow
+def test_search_remains_correct_as_catalog_grows():
+    """Author: Ethan. Slow: search remains correct as catalog grows from 1,000 to 10,000 products."""
+    catalog = Catalog()
+    product_count = 10_000
+    search_keyword = "python"
+
+    for product_id in range(product_count):
+        if product_id % 100 == 0:
+            title = f"python book {product_id}"
+        else:
+            title = f"history book {product_id}"
+
+        catalog.add_product(product_id, title, 100)
+
+        if (product_id + 1) % 1000 == 0:
+            expected_ids = set(range(0, product_id + 1, 100))
+            actual_ids = catalog.search_all(search_keyword)
+
+            assert len(actual_ids) == len(expected_ids)
+            assert set(actual_ids) == expected_ids
+
+@pytest.mark.slow
+def test_cart_checkout_history_persists():
+    """Author: Ethan. Slow: checkout history persists across multiple checkouts."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    catalog.add_product("B2", "JavaScript Book", 15)
+    cart = Cart(catalog)
+
+    # First checkout
+    cart.add("B1")
+    first_order = cart.checkout()
+    assert first_order == ["B1"]
+    assert cart.history() == [first_order]
+
+    # Second checkout
+    cart.add("B2")
+    second_order = cart.checkout()
+    assert second_order == ["B2"]
+    assert cart.history() == [first_order, second_order]
+
+@pytest.mark.slow
+def test_cart_import_and_checkout_large_number_of_products():  
+    """Author: Ethan. Slow: import and checkout a large number of products."""
+    catalog = Catalog()
+    cart = Cart(catalog)
+    product_count = 5_000
+
+    products = [
+        (product_id, f"book {product_id}", 100)
+        for product_id in range(product_count)
+    ]
+
+    # Import products
+    imported_count = cart.import_products(products)
+    assert imported_count == product_count
+    assert len(catalog.products) == product_count
+
+    # Add all products to the cart
+    for product_id in range(product_count):
+        assert cart.add(product_id) is True
+
+    # Checkout
+    order = cart.checkout()
+    assert len(order) == product_count
+    assert set(order) == set(range(product_count))
+
+@pytest.mark.slow
+def test_cart_checkout_history_with_multiple_orders():
+    """Author: Ethan. Slow: checkout history maintains all orders correctly."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    catalog.add_product("B2", "JavaScript Book", 15)
+    cart = Cart(catalog)
+
+    # First order
+    cart.add("B1")
+    first_order = cart.checkout()
+    assert first_order == ["B1"]
+    assert cart.history() == [first_order]
+
+    # Second order
+    cart.add("B2")
+    second_order = cart.checkout()
+    assert second_order == ["B2"]
+    assert cart.history() == [first_order, second_order]
