@@ -5,13 +5,13 @@
 
 ## Group Members
 
-| Member | GitHub Username | 
-|---|---|---|
-| Zwe Naing Set | DivineKeraunos | 
+| Member | GitHub Username |
+|---|---|
+| Zwe Naing Set | DivineKeraunos |
 | Aung Thet Khine | AungThetKhine21 |
-| Sai Lin That Maung | Sailinthant | 
+| Sai Lin That Maung | Sailinthant |
 | Shin Thant Aung | ShinnThanttAungg | 
-| Hein Naing Soe | ScottG619 | 
+| Hein Naing Soe | ScottG619 |
 
 ## Part 1 — AI Usage Declaration
 
