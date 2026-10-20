@@ -90,7 +90,7 @@ def test_cart_checkout_empty_cart():
     catalog = Catalog()
     cart = Cart(catalog)
 
-    assert cart.checkout() == []
+    assert cart.checkout() == None  # Should return None for an empty cart
 
 @pytest.mark.regression
 def test_cart_add_nonexistent_product():
@@ -210,7 +210,7 @@ def test_repeated_searches_return_correct_products_in_large_catalog():
     # Act and Assert
     # Slow: approximately 30 million product checks in total.
     for _ in range(search_count):
-        actual_ids = catalog.search("python")
+        actual_ids = catalog.search_all("python")
 
         assert len(actual_ids) == len(expected_ids)
         assert set(actual_ids) == expected_ids
