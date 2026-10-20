@@ -77,6 +77,20 @@ def test_checkout_nonempty_cart_and_saves_order_and_empties_cart():
     assert cart.items == []
     assert cart.history() == [[1, 2]]
 
+@pytest.mark.smoke
+def test_checkout_history_accumulates_across_orders():
+    """Author: Ethan. Smoke: each checkout is appended to the order history."""
+    catalog = Catalog()
+    catalog.add_product("B1", "Python Book", 10)
+    catalog.add_product("B2", "JavaScript Book", 15)
+    cart = Cart(catalog)
+    cart.add("B1")
+    first = cart.checkout()
+    cart.add("B2")
+    second = cart.checkout()
+    assert first == ["B1"] and second == ["B2"]
+    assert cart.history() == [["B1"], ["B2"]]
+
 # ---- REGRESSION TESTS (the bug hunt) ----
 
 @pytest.mark.regression
@@ -84,17 +98,27 @@ def test_login_password_special_characters():
     """Author: Aung Thet Khine. Check that login rejects an incorrect password."""
     users = Users()
     users.register("student1", "hello123")
-
+    assert users.login("student1", "hello123") is True
     assert users.login("student1", "hello@123") is False
-
 
 @pytest.mark.regression
 def test_catalog_search_case_insensitive():
     """Author: Aung Thet Khine. Check that searching ignores uppercase and lowercase."""
     catalog = Catalog()
     catalog.add_product(1, "Python Programming", 500)
-
     assert 1 in catalog.search("python")
+    assert 1 in catalog.search("PYTHON")
+
+@pytest.mark.regression
+def test_cart_total_includes_all_items():
+    """Author: Ethan. Check that the total price of the cart includes all items."""
+    _, cart = make_cart(10, 20, 30)
+    for pid in [1, 2, 3]:
+        cart.add(pid)
+    assert cart.total() == 60  # 10 + 20 + 30
+    _, single_cart = make_cart(15)
+    single_cart.add(1)
+    assert single_cart.total() == 15  # Only one item in the cart
 
 @pytest.mark.regression
 def test_cart_checkout_empty_cart():
@@ -102,34 +126,8 @@ def test_cart_checkout_empty_cart():
     catalog = Catalog()
     cart = Cart(catalog)
 
-    assert cart.checkout() == None  # Should return None for an empty cart
-
-@pytest.mark.regression
-def test_cart_add_nonexistent_product():
-    """Author: Ethan. Check that adding a nonexistent product returns False."""
-    catalog = Catalog()
-    cart = Cart(catalog)
-
-    assert cart.add("nonexistent_product") is False
-
-@pytest.mark.regression
-def test_cart_remove_product_not_in_cart():
-    """Author: Ethan. Check that removing a product not in the cart returns False."""
-    catalog = Catalog()
-    cart = Cart(catalog)
-
-    assert cart.remove("nonexistent_product") is False
-
-@pytest.mark.regression
-def test_cart_remove_product_in_cart():
-    """Author: Ethan. Check that removing a product in the cart returns True and removes it."""
-    catalog = Catalog()
-    catalog.add_product("B1", "Python Book", 10)
-    cart = Cart(catalog)
-    cart.add("B1")
-
-    assert cart.remove("B1") is True
-    assert "B1" not in cart.items
+    assert cart.checkout() == None  # Should return an empty list for an empty cart
+    assert cart.history() == [] # History should remain empty
 
 @pytest.mark.regression
 def test_cart_add_and_remove_product():
@@ -145,32 +143,36 @@ def test_cart_add_and_remove_product():
     assert "B1" not in cart.items
 
 @pytest.mark.regression
-def test_cart_checkout_with_multiple_products():
-    """Author: Ethan. Check that checkout returns all products in the cart."""
+def test_cart_add_and_remove_nonexistent_product():
+    """Author: Ethan. Check that adding or removing a nonexistent product returns False."""
     catalog = Catalog()
-    catalog.add_product("B1", "Python Book", 10)
-    catalog.add_product("B2", "JavaScript Book", 15)
     cart = Cart(catalog)
-    cart.add("B1")
-    cart.add("B2")
 
-    assert cart.checkout() == ["B1", "B2"]
-    assert cart.items == []
+    assert cart.add("nonexistent_product") is False
+    assert cart.remove("nonexistent_product") is False
 
 @pytest.mark.regression
-def test_cart_checkout_after_removing_product():
-    """Author: Ethan. Check that checkout returns the correct products after removing one."""
+def test_cart_remove_product_and_checkout_multiple_products():
+    """Author: Ethan. Check that removing a product and checking out the remaining items works correctly."""
     catalog = Catalog()
     catalog.add_product("B1", "Python Book", 10)
     catalog.add_product("B2", "JavaScript Book", 15)
     cart = Cart(catalog)
     cart.add("B1")
     cart.add("B2")
-    cart.remove("B1")
+
+    assert cart.remove("B1") is True
+    assert "B1" not in cart.items
 
     assert cart.checkout() == ["B2"]
     assert cart.items == []
 
+@pytest.mark.regression
+def test_import_products_returns_exact_count():
+    """Author: Ethan. Check that importing products returns the exact count of imported products."""
+    cart = Cart(Catalog())
+    assert cart.import_products([(1, "A", 5), (2, "B", 6)]) == 2
+    assert cart.import_products([]) == 0
 
 # ---- SLOW TESTS ----
 @pytest.mark.slow
