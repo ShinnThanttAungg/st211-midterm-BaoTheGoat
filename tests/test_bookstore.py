@@ -316,6 +316,7 @@ def test_two_hundred_thousand_checkouts_keeps_every_order():
 
 @pytest.mark.slow
 def test_random_cart_operations_match_a_simple_model():
+    """Author: Ethan. Slow: perform 1,000,000 random cart operations and verify the cart's state matches a simple model."""
     state = 211
 
     def rand(n):
