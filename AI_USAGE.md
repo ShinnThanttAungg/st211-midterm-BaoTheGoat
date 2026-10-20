@@ -5,13 +5,13 @@
 
 ## Group Members
 
-| Member | GitHub Username | Assigned File |
+| Member | GitHub Username | 
 |---|---|---|
-| Zwe Naing Set | DivineKeraunos | `test_deposit.py` |
-| Aung Thet Khine | AungThetKhine21 | `conftest.py` |
-| Sai Lin That Maung | Sailinthant | `test_withdraw.py` |
-| Shin Thant Aung | ShinnThanttAungg | `test_teardown.py` |
-| Hein Naing Soe | ScottG619 | `test_shared.py` |
+| Zwe Naing Set | DivineKeraunos | 
+| Aung Thet Khine | AungThetKhine21 |
+| Sai Lin That Maung | Sailinthant | 
+| Shin Thant Aung | ShinnThanttAungg | 
+| Hein Naing Soe | ScottG619 | 
 
 ## Part 1 — AI Usage Declaration
 
