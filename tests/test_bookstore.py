@@ -13,57 +13,69 @@ import pytest
 from bookstore_app import Users, Catalog, Cart
 
 
-@pytest.mark.smoke
-def test_example_register():
-    """Author: <example>. Smoke: a new user can register."""
-    assert Users().register("newuser", "password123") is True
-
+def make_cart(*prices):
+    """Helper: make a catalog and cart with products of the given prices."""
+    catalog = Catalog()
+    for pid, price in enumerate(prices, start=1):
+        catalog.add_product(pid, f"product {pid}", price)
+    return catalog, Cart(catalog)
 
 # ---- YOUR SMOKE TESTS (at least 5) ----
 @pytest.mark.smoke
-def test_register_user():
-    """Author: Sai. Smoke: a new user can register."""
+def test_register_user_and_reject_duplicates():
+    """Author: Sai. Smoke: a new user can register. And registration of a duplicate username is rejected."""
     users = Users()
     assert users.register("newuser", "password123") is True
+    assert "newuser" in users.users
+    assert users.register("newuser", "dummiebot321") is False
 
 
 @pytest.mark.smoke
-def test_login_works():
-    """Author: Sai. Smoke: a registered user can log in."""
+def test_login_works_and_rejects_invalid_credentials():
+    """Author: Sai. Smoke: a registered user can log in. Also checks that login rejects invalid credentials."""
     users = Users()
     users.register("alice", "password123")
     assert users.login("alice", "password123") is True
-
+    assert users.login("alice", "dummiebot321") is False
+    assert users.login("bob", "password123") is False  # unregistered user
 
 @pytest.mark.smoke
-def test_add_product_to_catalog():
-    """Author: Sai. Smoke: a product can be added to the catalog."""
+def test_add_to_cart_and_puts_item_in_cart():
+    """Author: Ethan. Smoke: a product can be added to the cart and is reflected in the cart's items."""
+    _, cart = make_cart(10, 20)
+    assert cart.add(1) is True
+    assert cart.items == [1]
+    assert cart.add(999) is False  # non-existent product
+    assert cart.items == [1]  # cart should remain unchanged
+
+@pytest.mark.smoke
+def test_add_product_is_saved_and_findable():
+    """Author: Sai. Smoke: a product can be added to the catalog and is findable."""
     catalog = Catalog()
     catalog.add_product("B1", "Python Book", 10)
+    assert catalog.products["B1"] == {"title": "Python Book", "price": 10}
+    assert catalog.search("Python") == ["B1"]
     assert "B1" in catalog.products
-
 
 @pytest.mark.smoke
 def test_add_product_to_cart():
-    """Author: Sai. Smoke: a valid product can be added to the cart."""
+    """Author: Sai. Smoke: a valid product can be added to the cart via catalog."""
     catalog = Catalog()
     catalog.add_product("B1", "Python Book", 10)
     cart = Cart(catalog)
     assert cart.add("B1") is True
     assert cart.items == ["B1"]
 
-
 @pytest.mark.smoke
-def test_checkout_cart():
-    """Author: Sai. Smoke: checkout saves the order."""
-    catalog = Catalog()
-    catalog.add_product("B1", "Python Book", 10)
-    cart = Cart(catalog)
-    cart.add("B1")
-
-    assert cart.checkout() == ["B1"]
+def test_checkout_nonempty_cart_and_saves_order_and_empties_cart():
+    """Author: Sai. Smoke: checkout saves the order and empties the cart."""
+    _, cart = make_cart(10, 20)
+    cart.add(1)
+    cart.add(2)
+    order = cart.checkout()
+    assert order == [1, 2]
     assert cart.items == []
-
+    assert cart.history() == [[1, 2]]
 
 # ---- REGRESSION TESTS (the bug hunt) ----
 
@@ -284,21 +296,11 @@ def test_cart_import_and_checkout_large_number_of_products():
     assert set(order) == set(range(product_count))
 
 @pytest.mark.slow
-def test_cart_checkout_history_with_multiple_orders():
-    """Author: Ethan. Slow: checkout history maintains all orders correctly."""
+def test_cart_checkout_empty_cart_returns_none():
+    """Author: Ethan. Slow: checkout returns None for an empty cart."""
     catalog = Catalog()
-    catalog.add_product("B1", "Python Book", 10)
-    catalog.add_product("B2", "JavaScript Book", 15)
     cart = Cart(catalog)
 
-    # First order
-    cart.add("B1")
-    first_order = cart.checkout()
-    assert first_order == ["B1"]
-    assert cart.history() == [first_order]
+    result = cart.checkout()
+    assert result is None
 
-    # Second order
-    cart.add("B2")
-    second_order = cart.checkout()
-    assert second_order == ["B2"]
-    assert cart.history() == [first_order, second_order]
