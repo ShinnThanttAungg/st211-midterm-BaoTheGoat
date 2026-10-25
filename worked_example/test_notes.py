@@ -8,7 +8,7 @@ from worked_example.notes import Notes
 
 
 def test_word_count_counts_words_not_characters():
-    """Author: (worked example). word_count() should count WORDS, but returns a
+    """Author: Shin Thant Aung. word_count() should count WORDS, but returns a
     character count instead."""
     n = Notes()
     n.add("hello world")      # 2 words, 11 characters
@@ -17,6 +17,6 @@ def test_word_count_counts_words_not_characters():
     assert n.word_count() == 3
 
 def test_word_count_empty_notes():
-    """Author: (worked example). word_count() should return 0 for an empty note list."""
+    """Author: Shin Thant Aung. word_count() should return 0 for an empty note list."""
     n = Notes()
     assert n.word_count() == 0
