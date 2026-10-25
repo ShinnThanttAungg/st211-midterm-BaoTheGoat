@@ -5,7 +5,7 @@ It FAILS against notes.py as shipped -- that is the point. A regression test
 that fails is a test that has detected something.
 """
 from worked_example.notes import Notes
-
+ 
 
 def test_word_count_counts_words_not_characters():
     """Author: Shin Thant Aung. word_count() should count WORDS, but returns a
