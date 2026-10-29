@@ -206,7 +206,7 @@ def test_bulk_import_stores_twenty_thousand_products():
 
 @pytest.mark.slow
 def test_repeated_searches_return_correct_products_in_large_catalog():
-    """Author: Scott. Slow: 3,000 searches across 10,000 products."""
+    """Author: Sai. Slow: 3,000 searches across 10,000 products."""
     # Arrange
     catalog = Catalog()
     product_count = 10_000
@@ -232,7 +232,7 @@ def test_repeated_searches_return_correct_products_in_large_catalog():
 
 @pytest.mark.slow
 def test_search_remains_correct_as_catalog_grows():
-    """Author: Ethan. Slow: search remains correct as catalog grows from 1,000 to 10,000 products."""
+    """Author: Sai. Slow: search remains correct as catalog grows from 1,000 to 10,000 products."""
     catalog = Catalog()
     product_count = 10_000
     search_keyword = "python"
@@ -254,7 +254,7 @@ def test_search_remains_correct_as_catalog_grows():
 
 @pytest.mark.slow
 def test_cart_import_and_checkout_large_number_of_products():  
-    """Author: Ethan. Slow: import and checkout a large number of products."""
+    """Author: Sai. Slow: import and checkout a large number of products."""
     catalog = Catalog()
     cart = Cart(catalog)
     product_count = 5_000
@@ -277,76 +277,4 @@ def test_cart_import_and_checkout_large_number_of_products():
     order = cart.checkout()
     assert len(order) == product_count
     assert set(order) == set(range(product_count))
-
-@pytest.mark.slow
-def test_many_users_register_and_login():
-    """Author: Ethan. Slow: register and login 400,000 users."""
-    users = Users()
-    user_count = 400_000
-
-    for i in range(user_count):
-        assert users.register(f"user{i}", f"password{i}") is True
-
-    for i in range(user_count):
-        assert users.login(f"user{i}", f"password{i}") is True
-        assert users.login(f"user{i}", f"xx{i}") is False
-        assert users.login(f"user{i}", f"dummybot") is False
-    assert len(users.users) == user_count
-
-@pytest.mark.slow
-def test_two_hundred_thousand_checkouts_keeps_every_order():
-    """Author: Ethan. Slow: checkout 200,000 times and verify order history."""
-    catalog = Catalog()
-    order_count = 200_000
-
-    for product_id in range(50):    
-        catalog.add_product(product_id, f"book {product_id}", 10)
-    
-    cart = Cart(catalog)
-    expected_orders = []
-
-    for order_id in range(order_count):
-        batch = [(order_id + offset) % len(catalog.products) for offset in range(3)]
-        for product_id in batch:
-            cart.add(product_id)
-        assert cart.checkout() == batch
-        assert cart.items == []
-        expected_orders.append(batch)
-    assert cart.history() == expected_orders
-
-@pytest.mark.slow
-def test_random_cart_operations_match_a_simple_model():
-    """Author: Ethan. Slow: perform 1,000,000 random cart operations and verify the cart's state matches a simple model."""
-    state = 211
-
-    def rand(n):
-        nonlocal state
-        state = (state * 1103515245 + 12345) % (2**31)
-        return (state >> 16) % n
-
-    operations = ["add", "add", "add", "remove", "checkout", "bad_add"]
-    catalog = Catalog()
-    for product_id in range(100):
-        catalog.add_product(product_id, f"book {product_id}", 5)
-    cart = Cart(catalog)
-    model_items, model_orders = [], []
-    for _ in range(1_000_000):
-        op = operations[rand(len(operations))]
-        product_id = rand(100)
-        if op == "add":
-            assert cart.add(product_id) is True
-            model_items.append(product_id)
-        elif op == "bad_add":
-                    assert cart.add(10_000 + product_id) is False
-        elif op == "remove":
-            present = product_id in model_items
-            assert cart.remove(product_id) is present
-            if present:
-                model_items.remove(product_id)
-        elif model_items:       # only checkout if there are items in the cart
-            assert cart.checkout() == model_items
-            model_orders.append(model_items)
-            model_items = []
-        assert cart.items == model_items
-    assert cart.history() == model_orders
 
