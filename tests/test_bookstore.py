@@ -177,7 +177,7 @@ def test_import_products_returns_exact_count():
 # ---- SLOW TESTS ----
 @pytest.mark.slow
 def test_bulk_import_stores_twenty_thousand_products():
-    """Author: Scott. Slow: import and verify 20,000 products."""
+    """Author: Sai. Slow: import and verify 20,000 products."""
     # Arrange
     catalog = Catalog()
     cart = Cart(catalog)
