@@ -1,3 +1,15 @@
+**Group Name:** BaoTheGoat
+
+### Members
+
+- Shin Thant Aung — 6705140076
+- Sai Lin Thant Maung — 6705140073
+- Aung Thet Khine — 6705142032
+- Zwe Naing Sett — 6705140077
+- Hein Naing Soe — 6705140071
+
+----
+
 # Bookstore QA Midterm
 
 A small (buggy) online-bookstore application for you to test.

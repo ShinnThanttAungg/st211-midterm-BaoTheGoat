@@ -53,4 +53,4 @@ A test that passes against buggy code can be dangerous because it may give the t
 
 In the future, we will check AI-generated tests against the project requirements and inspect the assertions carefully. We will run tests against the original application and the modified application, examine the actual output, and verify that each test detects the intended problem. We will also avoid treating an AI-suggested requirement as correct until we find evidence in the assignment instructions or documented application behavior.
 
-Before submission, we will complete the missing evidence for all eight supplied tests and verify the final verdicts against the actual test results.
+
