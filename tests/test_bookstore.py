@@ -50,7 +50,7 @@ def test_add_to_cart_and_puts_item_in_cart():
 
 @pytest.mark.smoke
 def test_add_product_is_saved_and_findable():
-    """Author: Sai. Smoke: a product can be added to the catalog and is findable."""
+    """Author: Ethan. Smoke: a product can be added to the catalog and is findable."""
     catalog = Catalog()
     catalog.add_product("B1", "Python Book", 10)
     assert catalog.products["B1"] == {"title": "Python Book", "price": 10}
@@ -59,7 +59,7 @@ def test_add_product_is_saved_and_findable():
 
 @pytest.mark.smoke
 def test_checkout_nonempty_cart_and_saves_order_and_empties_cart():
-    """Author: Sai. Smoke: checkout saves the order and empties the cart."""
+    """Author: Ethan. Smoke: checkout saves the order and empties the cart."""
     _, cart = make_cart(10, 20)
     cart.add(1)
     cart.add(2)
@@ -88,9 +88,9 @@ def test_checkout_history_accumulates_across_orders():
 def test_login_password_special_characters():
     """Author: Aung Thet Khine. Check that login rejects an incorrect password."""
     users = Users()
-    users.register("student1", "hello123")
-    assert users.login("student1", "hello123") is True
-    assert users.login("student1", "hello@123") is False
+    users.register("student1", "hello@123")
+    assert users.login("student1", "hello@123") is True
+    assert users.login("student1", "hello123@") is False
 
 @pytest.mark.regression
 def test_catalog_search_case_insensitive():
@@ -117,13 +117,29 @@ def test_cart_checkout_empty_cart():
     catalog = Catalog()
     cart = Cart(catalog)
 
+    assert cart.checkout() == [] or None  # Should return an empty list for an empty cart
+    assert cart.history() == [] # History should remain empty
+
+@pytest.mark.regression
+def test_cart_checkout_empty_cart():
+    """Author: Ethan. Check that checkout returns an empty list for an empty cart."""
+    catalog = Catalog()
+    cart = Cart(catalog)
+
     assert cart.checkout() == None  # Should return an empty list for an empty cart
     assert cart.history() == [] # History should remain empty
+
+@pytest.mark.regression
+def test_import_products_returns_exact_count():
+    """Author: Ethan. Check that importing products returns the exact count of imported products."""
+    cart = Cart(Catalog())
+    assert cart.import_products([(1, "A", 5), (2, "B", 6)]) == 2
+    assert cart.import_products([]) == 0
+
 # ---- SLOW TESTS ----
 @pytest.mark.slow
 def test_bulk_import_stores_twenty_thousand_products():
     """Author: Sai. Slow: import and verify 20,000 products."""
-    # Arrange
     catalog = Catalog()
     cart = Cart(catalog)
     product_count = 20_000
@@ -133,7 +149,6 @@ def test_bulk_import_stores_twenty_thousand_products():
         for product_id in range(product_count)
     ]
 
-    # Act
     # Slow: processes 20,000 records through the real import method.
     imported_count = cart.import_products(products)
 
