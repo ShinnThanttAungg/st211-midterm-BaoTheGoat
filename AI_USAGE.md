@@ -13,7 +13,9 @@
 |---|---|
 | ChatGPT | Helped us understand the bookstore project requirements, Python functions, pytest markers, and Git commands. |
 | ChatGPT | Suggested test cases for smoke testing and regression testing and helped us understand the bugs in login, product search, cart totals, checkout, and product importing. |
-| ChatGPT | Helped us organize `FINDINGS.md`, `REPORT.md`, and this AI usage declaration. |
+| ChatGPT | |
+| ClaudeAI | Helped us suggesting detailed slow pytest. |
+| ClaudeAI | |
 
 We used AI as a learning and development assistant. We reviewed its suggestions and compared them with our code, assignment requirements, and test results. We understand that AI-generated tests can contain incorrect assumptions and must be checked before being trusted.
 
