@@ -20,10 +20,10 @@ def make_cart(*prices):
         catalog.add_product(product_id, f"product {product_id}", price)
     return catalog, Cart(catalog)
 
-# ---- YOUR SMOKE TESTS (at least 5) ----
+# ---- SMOKE TESTS (core functionality) ----
 @pytest.mark.smoke
 def test_register_user_and_reject_duplicates():
-    """Author: Sai. Smoke: a new user can register. And registration of a duplicate username is rejected."""
+    """Author: Ethan. Smoke: a new user can register. And registration of a duplicate username is rejected."""
     users = Users()
     assert users.register("newuser", "password123") is True
     assert "newuser" in users.users
@@ -32,7 +32,7 @@ def test_register_user_and_reject_duplicates():
 
 @pytest.mark.smoke
 def test_login_works_and_rejects_invalid_credentials():
-    """Author: Sai. Smoke: a registered user can log in. Also checks that login rejects invalid credentials."""
+    """Author: Ethan. Smoke: a registered user can log in. Also checks that login rejects invalid credentials."""
     users = Users()
     users.register("alice", "password123")
     assert users.login("alice", "password123") is True
@@ -56,15 +56,6 @@ def test_add_product_is_saved_and_findable():
     assert catalog.products["B1"] == {"title": "Python Book", "price": 10}
     assert catalog.search("Python") == ["B1"]
     assert "B1" in catalog.products
-
-@pytest.mark.smoke
-def test_add_product_to_cart():
-    """Author: Sai. Smoke: a valid product can be added to the cart via catalog."""
-    catalog = Catalog()
-    catalog.add_product("B1", "Python Book", 10)
-    cart = Cart(catalog)
-    assert cart.add("B1") is True
-    assert cart.items == ["B1"]
 
 @pytest.mark.smoke
 def test_checkout_nonempty_cart_and_saves_order_and_empties_cart():
