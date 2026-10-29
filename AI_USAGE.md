@@ -6,6 +6,8 @@
 - Aung Thet Khine — 6705142032
 - Sai Lin Thant Maung — 6705140073
 - Shin Thant Aung — 6705140076
+- Zwe Naing Set — 6705140077
+- Hein Naing Soe — 6705140071
 
 ## D3.1 Declaration (required)
 
