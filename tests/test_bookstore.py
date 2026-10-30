@@ -309,3 +309,30 @@ def test_random_cart_operations_match_a_simple_model():
             model_items = []
         assert cart.items == model_items
     assert cart.history() == model_orders
+
+# Bonus Mark Try
+@pytest.mark.slow
+def test_search_all_mixed_case_bulk_results_remain_complete():
+    """Author: Ethan. Slow regression: mixed-case bulk searches stay complete."""
+    catalog = Catalog()
+    product_count = 20_000
+    title_variants = ("Python", "PYTHON", "python", "PyThOn")
+    queries = ("python", "PYTHON", "PyThOn", "pYtHoN")
+    expected_ids = set(range(0, product_count, 10))
+
+    for product_id in range(product_count):
+        if product_id % 10 == 0:
+            word = title_variants[(product_id // 10) % len(title_variants)]
+            title = f"{word} book {product_id}"
+        else:
+            title = f"History book {product_id}"
+        catalog.add_product(product_id, title, 100)
+
+    for attempt in range(10_000):
+        query = queries[attempt % len(queries)]
+        actual_ids = catalog.search_all(query)
+        assert len(actual_ids) == len(expected_ids), (attempt, query)
+        assert set(actual_ids) == expected_ids, (attempt, query)
+
+    assert catalog.search_all("no-such-title") == []
+    
