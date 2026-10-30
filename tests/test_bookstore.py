@@ -185,7 +185,7 @@ def test_repeated_searches_return_correct_products_in_large_catalog():
     # Act and Assert
     # Slow: approximately 30 million product checks in total.
     for _ in range(search_count):
-        actual_ids = catalog.search_all("python")
+        actual_ids = catalog.search("python")
 
         assert len(actual_ids) == len(expected_ids)
         assert set(actual_ids) == expected_ids
@@ -207,7 +207,7 @@ def test_search_remains_correct_as_catalog_grows():
 
         if (product_id + 1) % 1000 == 0:
             expected_ids = set(range(0, product_id + 1, 100))
-            actual_ids = catalog.search_all(search_keyword)
+            actual_ids = catalog.search(search_keyword)
 
             assert len(actual_ids) == len(expected_ids)
             assert set(actual_ids) == expected_ids
@@ -330,9 +330,9 @@ def test_search_all_mixed_case_bulk_results_remain_complete():
 
     for attempt in range(10_000):
         query = queries[attempt % len(queries)]
-        actual_ids = catalog.search_all(query)
+        actual_ids = catalog.search(query)
         assert len(actual_ids) == len(expected_ids), (attempt, query)
         assert set(actual_ids) == expected_ids, (attempt, query)
 
-    assert catalog.search_all("no-such-title") == []
+    assert catalog.search("no-such-title") == []
     
