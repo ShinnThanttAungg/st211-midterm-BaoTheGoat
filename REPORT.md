@@ -2,14 +2,14 @@
 
 ## Midterm Project Report
 
-**Instructor:** Arj. Doung Vu Xuan Quynh
-
+**Course:** Automated Software Testing (192-211)  
+**Instructor:** Arj. Doung Vu Xuan Quynh  
 **Group Name:** BaoTheGoat
 
 ### Members
 
 - Shin Thant Aung — 6705140076
-- Sai Lin Thant Maung — 6705140073
+- Sai Thant Lin Maung — 6705140073
 - Aung Thet Khine — 6705142032
 - Zwe Naing Sett — 6705140077
 - Hein Naing Soe — 6705140071
@@ -20,6 +20,8 @@
 
 - [Part A — Test Types](#part-a--test-types)
 - [Part B — Scenario Classification](#part-b--scenario-classification)
+- [Part C — Test Execution Results](#part-c--test-execution-results)
+- [Part D — AI-Generated Test Review](#part-d--ai-generated-test-review)
 - [Part F — Team Reflection](#part-f--team-reflection)
 - [Conclusion](#conclusion)
 
@@ -29,97 +31,223 @@
 
 ### 1. Smoke Testing
 
-Smoke testing ensures that the primary application's functions are working. It is typically executed first after a new build, deployment, or code change to catch major issues.
+Smoke testing is a basic test that checks whether the main functions of an application work correctly. It helps us find major problems before running more detailed tests.
 
-**Bookstore examples:**
+In our online bookstore project, smoke tests check important features such as:
 
-1. Test whether a new user can register and log in successfully.
-2. Verify whether a customer can add a book to the cart and complete checkout with a non-empty cart.
+- Registering a new user and rejecting duplicate usernames.
+- Logging in with correct and incorrect credentials.
+- Adding products to the shopping cart.
+- Adding products to the catalog and searching for them.
+- Checking out a cart and saving the order.
+- Checking that order history can store multiple orders.
+
+Smoke tests should run whenever developers push new code to the repository. They help the team quickly check whether the main application functions are still working.
 
 ### 2. Regression Testing
 
-Regression testing checks whether features still perform as expected after changing code or fixing bugs. It should run after changes that could affect existing functionality and before major releases.
+Regression testing checks whether previously working features still work after code changes or bug fixes.
 
-**Bookstore examples:**
+In our bookstore application, regression tests are important because changing one function may affect another function.
 
-1. After fixing the login bug, test that the registered password is accepted and an incorrect password is rejected.
-2. After fixing the cart total bug, test whether the cart total includes all items.
+Examples include:
+
+- Checking that passwords containing special characters are handled correctly.
+- Checking that catalog search works with uppercase and lowercase letters.
+- Checking that the cart calculates the total price of every product.
+- Checking that checking out an empty cart does not create an incorrect order.
+- Checking that importing products returns the correct number.
+
+Regression tests should run after bug fixes and whenever related code is changed.
 
 ### 3. Slow Testing
 
-Slow testing checks application behaviour when a large workload is used or operations take a longer time. These tests are typically performed as part of planned CI/CD jobs, such as nightly runs, rather than after every small code change.
+Slow testing checks application performance and behavior when handling large amounts of data or repeated operations. These tests usually take longer than normal tests.
 
-**Bookstore examples:**
+In our bookstore project, examples include:
 
-1. Import 10 to 100,000 products and verify that the correct number is returned.
-2. Perform many cart operations and check whether the application continues to function as expected.
+- Importing 20,000 products.
+- Performing 3,000 searches in a catalog containing 10,000 products.
+- Checking search results as the catalog grows.
+- Importing and checking out 5,000 products.
+- Registering and logging in 400,000 users.
+- Performing 200,000 checkout operations.
+- Performing 1,000,000 random cart operations.
+- Checking mixed-case search results in a large catalog.
+
+Slow tests help us understand whether the application can handle larger workloads without unexpected problems.
+
+They should normally run separately from quick smoke tests, such as during a scheduled nightly test.
 
 ---
 
 ## Part B — Scenario Classification
 
-### Scenario 1: Verify that a password-reset email is delivered within one minute.
+The following scenarios show how we classify different tests in our online bookstore application.
 
-**Classification: Smoke testing**
+| No. | Test Scenario | Test Type | Reason |
+|---|---|---|---|
+| 1 | Check that a user can register and log in successfully. | Smoke | Registration and login are important basic functions. |
+| 2 | Check that login handles passwords containing special characters correctly. | Regression | It checks a previously identified password-handling problem. |
+| 3 | Check that catalog search works with different uppercase and lowercase letters. | Regression | It checks the previous search problem. |
+| 4 | Check that the cart calculates the total price of all products. | Regression | It prevents the previous bug where the last item was skipped. |
+| 5 | Check that an empty cart does not create an incorrect order. | Regression | It checks the expected behavior of empty checkout. |
+| 6 | Check that importing products returns the correct number. | Regression | It checks the previous incorrect import count. |
+| 7 | Import and search through thousands of products repeatedly. | Slow | It checks application behavior under a large workload. |
+| 8 | Perform a large number of user, cart, and checkout operations. | Slow | It checks whether the application can handle repeated operations. |
 
-This may be used as a smoke test because it checks whether an important function works within the required response time. It can run after deployment to identify a major problem with password reset. A more detailed email-delivery test may also be included in the regression suite.
+Some scenarios may belong to more than one test type. For example, a test can be both regression and slow if it checks an existing bug under a large workload.
 
-### Scenario 2: Verify that a previously fixed bug in shipping-cost calculation has not returned.
+---
 
-**Classification: Regression testing**
+## Part C — Test Execution Results
 
-This is regression testing because it verifies that a previously fixed bug does not return after a code change. The test should use input that caused the problem in the past and ensure that the shipping cost is calculated correctly.
+We used Pytest to execute our smoke, regression, and slow tests separately. We also ran the complete test suite to check the overall project.
 
-### Scenario 3: Verify that a nightly job can generate a sales report from ten years of orders.
+### 1. Smoke Test Results
 
-**Classification: Slow testing**
+Command:
 
-This is slow testing because processing ten years of order data can take significant time and resources. It is suitable for an automated nightly test because it processes a large amount of historical data.
+`python -m pytest -m smoke -v`
 
-### Scenario 4: Verify that the payment page loads after every deployment.
+Result:
 
-**Classification: Smoke testing**
+**6 passed, 23 deselected in 0.09s**
 
-This is a smoke test because it checks whether an important page is available after deployment. It should run early in the deployment pipeline so the team can detect a major problem before spending time on more detailed testing.
+All six smoke tests passed. The results show that the main bookstore functions, including user registration, login, product searching, cart operations, checkout, and order history, worked correctly during this test run.
 
-### Scenario 5: Verify that a refund issued twice does not credit the customer twice — a fault reported by a customer last quarter.
+### 2. Regression Test Results
 
-**Classification: Regression testing**
+Command:
 
-This is regression testing because it checks a previously reported defect. The test should generate the same refund request twice and ensure that the customer is credited only once. This helps prevent the same issue from occurring again.
+`python -m pytest -m regression -v`
 
-### Scenario 6: Verify that the recommendation engine still responds when the catalogue holds one million titles.
+Result:
 
-**Classification: Slow testing**
+**5 passed, 24 deselected in 0.07s**
 
-This is slow testing because it checks system performance and behaviour with a very large catalogue. Preparing the data and running the test may require substantial time and resources. It is suitable for scheduled performance or load testing.
+All five collected regression tests passed. The tests checked the five previously investigated application problems.
+
+### 3. Slow Test Results
+
+Command:
+
+`python -m pytest -m slow -v`
+
+Result:
+
+**8 passed, 21 deselected in 74.43s**
+
+All eight slow tests passed. They checked large product imports, repeated catalog searches, user registration and login, checkout history, and random cart operations.
+
+### 4. Full Test Suite Results
+
+Command:
+
+`python -m pytest -v`
+
+Result:
+
+**28 passed, 1 failed in 78.21s**
+
+The full test suite included the team's tests, the AI review tests, and the worked-example tests.
+
+The only failure was:
+
+`ai_review/test_ai_generated.py::test_search_is_limited_to_ten_results`
+
+This test expected the catalog search to return no more than ten results. However, the application returned twenty matching products.
+
+This failure belongs to the AI-generated test review. It does not mean that one of our five confirmed application bug fixes failed.
+
+---
+
+## Part D — AI-Generated Test Review
+
+### 1. AI Tools Used
+
+We used ChatGPT and Claude during the project.
+
+We used these tools to help us understand the requirements, investigate possible bugs, suggest test cases, and review our findings.
+
+However, we did not accept every AI suggestion automatically. We checked the suggestions against our application code and actual test results.
+
+The detailed AI declaration and review are provided in the separate `AI_USAGE.md` file.
+
+### 2. AI-Generated Test Execution
+
+We executed the eight AI-generated tests separately.
+
+Command:
+
+`python -m pytest ai_review/test_ai_generated.py -v`
+
+Result:
+
+**7 passed, 1 failed in 0.13s**
+
+Seven AI-generated tests passed. One test failed:
+
+`test_search_is_limited_to_ten_results`
+
+The test created twenty matching products and expected the search function to return ten or fewer results. The actual result contained twenty products.
+
+### 3. Review of the Failed AI Test
+
+We reviewed the failed test and found that its expectation was not clearly supported by the project requirements provided to us.
+
+The test assumed that catalog search must limit results to ten products. However, our project requirements did not specify this limitation.
+
+Therefore, we did not classify this failure as a confirmed application bug. It demonstrates that AI-generated tests can include assumptions that are not part of the actual requirements.
+
+### 4. What We Learned from AI Testing
+
+AI tools can help developers create test ideas and find possible problems more quickly. However, AI-generated tests still need to be reviewed.
+
+A test can fail because the application has a real bug, but it can also fail because the test expects behavior that was never required.
+
+We learned that we should always compare AI-generated tests with the project requirements, source code, and actual application behavior before accepting them.
 
 ---
 
 ## Part F — Team Reflection
 
-### 1. Why is running only regression tests before every commit inefficient?
+### 1. What was the most difficult part of this project?
 
-The full regression suite might take a long time to run, particularly if some tests are slow. Smoke tests can validate the primary features quickly, while the full regression suite can run at an appropriate stage.
+The most difficult part was finding bugs and understanding why the application did not behave as expected. Some problems were not easy to notice because the application could still run without showing an error.
 
-### 2. Why do smoke tests usually run first in a CI/CD pipeline?
+We needed to read the source code, create test cases, and compare the actual results with the expected results.
 
-Smoke tests usually take a short amount of time and check the most critical features. If a major feature is malfunctioning, the pipeline can stop early instead of spending time running many detailed tests.
+### 2. How did testing help us improve the application?
 
-### 3. What risks arise if slow tests are never run?
+Testing helped us identify problems in different parts of the bookstore application. For example, we found issues with password handling, catalog searching, cart total calculation, empty checkout, and product importing.
 
-Some problems might only appear with large datasets or many operations. If slow tests are never run, the team may overlook performance problems, failures under heavy loads, or issues that do not appear during normal use.
+After identifying these problems, we worked on fixes and used regression tests to check whether the problems were solved.
 
-### 4. Can one test belong to two categories? Give an example.
+### 3. What did we learn about teamwork?
 
-Yes. A single test may belong to two categories because the categories describe different characteristics. For example, a test that checks a previously fixed cart bug while processing a very large order can have both regression and slow-testing characteristics.
+We learned that dividing tasks among team members can make the work easier and faster. Each member could focus on different parts of the project, such as writing tests, investigating bugs, fixing code, and reviewing results.
 
-### 5. What does separating bug-finders and bug-fixers change about how a bug report must be written?
+We also learned that communication is important because changes made by one member can affect another member's work.
 
-A bug report should be clear and detailed when different people find and fix bugs. It should describe how to reproduce the problem, the input provided, the actual output, the expected output, and any error messages. This helps the developer understand and resolve the issue without having to guess what happened.
+### 4. What did we learn about using AI tools?
+
+We used ChatGPT and Claude to help us understand the project requirements, investigate possible bugs, and review test ideas.
+
+However, AI-generated tests were not automatically accepted. We checked their assumptions against the project code and actual test results. Some AI suggestions were useful, while others expected behavior that was not clearly required by the project.
+
+### 5. What would we improve next time?
+
+Next time, we would start testing earlier and organize our test cases more carefully. We would also update Git more regularly so that every team member can work with the latest version.
+
+We would run the full test suite after important code changes and keep clear records of test results.
 
 ---
 
 ## Conclusion
 
-In this project, we learned about smoke testing, regression testing, and slow testing. We also classified different testing scenarios and discussed the importance of each testing type. This project helped us understand how testing can uncover bugs, prevent old bugs from returning, and improve software quality.
+Through this project, we gained practical experience in automated software testing using Python and Pytest. We learned how to create smoke, regression, and slow tests, identify bugs, and check whether code changes fix the problems.
+
+Our separate test runs showed that all six smoke tests, five regression tests, and eight slow tests passed. The full test suite reported 28 passed and one failed. The failed test came from the AI review and used a search-result limit that was not clearly specified in the project requirements.
+
+We also learned that a test passing does not always mean that the application is completely correct. Test cases must have clear expected results and should be based on the actual project requirements.
